@@ -40,7 +40,7 @@ mr_bfs_res = MR_BFS(G, euler_tour[0])
 
 # 对后续点应用INC_BFS
 for i in range(len(euler_tour)):
-    if i != 1:
+    if i != 0:
         incremental_bfs_res = INC_BFS(G, euler_tour[i])
 
 
