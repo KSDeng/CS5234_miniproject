@@ -6,6 +6,12 @@ from matplotlib import pyplot as plt
 n = 6           # 点的个数
 p = 0.5         # 点与点间连接的概率
 
+def generate_fixed_graph():
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 4, 5])
+    G.add_edges_from([(0, 3), (0, 5), (1, 2), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5)])
+    return G
+
 def generate_graph():
     return nx.gnp_random_graph(n=n, p=p)
 
@@ -17,11 +23,12 @@ def MR_BFS(G, source):
 def INC_BFS(G, srouce):
     return 0
 
-G = generate_graph()
+# G = generate_graph()
+G = generate_fixed_graph()
 
 # 当不是连通图时重新生成
-while nx.algorithms.number_connected_components(G) > 1:
-    G = generate_graph()
+# while nx.algorithms.number_connected_components(G) > 1:
+#    G = generate_graph()
 
 # 比较美观的可视化参数
 plt.figure(figsize=(5,3))
