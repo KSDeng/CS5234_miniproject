@@ -51,14 +51,77 @@ def get_portion_of_sorted_adj_list(dist, sorted_adj_list, i):
             portion_adj_list[key] = value
     return portion_adj_list
 
+def MR_BFS(G, source, adj_list):
+    L = {-1:[], 0:[source]}         # 初始化L
+    for i in range(1, len(G.nodes)):
+
+        # Step (1): Construct N(L(i-1)) by accessing the adjacency list of nodes in L(i-1)
+        temp = []
+        for node in L[i-1]:
+            temp += adj_list[node]
+
+        # Step (2): Remove the duplicates in N[i-1] by sorting the nodes in N[i-1] by node indexes
+        temp.sort()
+        temp = list(set(temp))
+        # the result is L'(i)
+
+        # Step (3): Remove the nodes appear in L(i-1) and L(i-2)
+        temp = [item for item in temp if item not in L[i-1]]
+        temp = [item for item in temp if item not in L[i-2]]
+        L[i] = temp
+    return L
+
+
+def INC_BFS(G, U, V, dist, adj_list):
+    L = {-1:[], 0:[V]}
+
+    sorted_adj_list = sort_adj_list_by_dist(adj_list, dist)
+
+    for i in range(1, len(G.nodes)):
+
+        # Step (1): Extract the adjacency list of each w E V[G] that appears in
+        # L(i - 1) and whose adjacency list appears in A(j) by scanning L(i - 1) and A(j) simultaneously.
+        temp = []
+        for j in range(max(0, i-1-dist[V]), min(len(G.nodes)-1, i-1+dist[V])+1):
+            Ai = get_portion_of_sorted_adj_list(dist, sorted_adj_list, j)
+            for node in L[i-1]:
+                if node in Ai.keys():
+                    temp += Ai[node]
+
+        # Step (2): Remove the duplicates in N[i-1] by sorting the nodes in N[i-1] by node indexes
+        temp.sort()
+        temp = list(set(temp))
+        # the result is L'(i)
+
+        # Step (3): Remove the nodes appear in L(i-1) and L(i-2)
+        temp = [item for item in temp if item not in L[i-1]]
+        temp = [item for item in temp if item not in L[i-2]]
+        L[i] = temp
+    return L
+
+
+# 测试差集
+
+# list1 = [1,2,3,4,5]
+# list2 = [3,4,5,6,7]
+# r1 = [item for item in list1 if item not in list2]
+# print(r1)
+
 G = generate_fixed_graph()
 adj_list = generate_adjlist_as_dict(G)
 print(adj_list)
 dist0 = {1:2, 2:2, 3:1, 4:3, 5:1}       # generate by MR-BFS
+
+
+L1 = INC_BFS(G, 0, 3, dist0, adj_list)
+
 # sort ajd_list according to dist0
 print(dist0)
 sorted_adj_list = sort_adj_list_by_dist(adj_list, dist0)
 print(sorted_adj_list)
+
+# test MR-BFS
+L = MR_BFS(G, 0, adj_list)
 
 portion_adj_list = get_portion_of_sorted_adj_list(dist0, sorted_adj_list, 2)
 print(portion_adj_list)
