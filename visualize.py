@@ -47,8 +47,8 @@ pos = {0: [0.93976803, 0.53330404],
        4: [-1.       , -0.5206796],
        5: [ 0.44018934, -0.21204066]}
 print(pos)
-# nx.draw(G, pos, with_labels=True, width=0.4, node_color='lightblue', node_size=400)
-nx.draw(G, pos, with_labels=True, width=0.4, node_color='red', node_size=400)
+nx.draw(G, pos, with_labels=True, width=0.4, node_color='lightblue', node_size=400)
+# nx.draw(G, pos, with_labels=True, width=0.4, node_color='red', node_size=400)
 
 # highlight source node
 #nx.draw(G.subgraph([0]), pos={0:[0.93976803, 0.53330404]}, node_color='red',with_labels=True, width=0.4, node_size=400)
@@ -59,7 +59,9 @@ nx.draw(G, pos, with_labels=True, width=0.4, node_color='red', node_size=400)
 #nx.draw(G.subgraph([1,2,4]), pos=pos3, node_color='yellow', with_labels=True, width=0.4, node_size=400)
 
 # highlight edges
-# nx.draw_networkx_edges(G, pos=pos, edgelist=[(0,3),(0,5)], edge_color='r')
+nx.draw_networkx_edges(G, pos=pos, edgelist=[(3,2)], edge_color='red')
+nx.draw_networkx_edges(G, pos=pos, edgelist=[(2,4)], edge_color='blue')
+
 
 
 pylab.show()
