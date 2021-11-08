@@ -113,7 +113,7 @@ print(adj_list)
 dist0 = {1:2, 2:2, 3:1, 4:3, 5:1}       # generate by MR-BFS
 
 
-L1 = INC_BFS(G, 0, 3, dist0, adj_list)
+L1 = INC_BFS(G, 0, 2, dist0, adj_list)
 
 # sort ajd_list according to dist0
 print(dist0)
