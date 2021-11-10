@@ -1,5 +1,7 @@
 import math
 import networkx as nx
+import pylab
+from matplotlib import pyplot as plt
 
 M = 100.0         # Memory size
 B = 10.0          # Block size of disk
@@ -9,6 +11,12 @@ def generate_fixed_graph():
     G = nx.Graph()
     G.add_nodes_from([0, 1, 2, 3, 4, 5])
     G.add_edges_from([(0, 3), (0, 5), (1, 2), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5)])
+    return G
+
+def generate_debug_graph():
+    G = nx.Graph()
+    G.add_nodes_from([0,1,2,3,4,5,6,7,8,9])
+    G.add_edges_from([(0,1),(1,2),(1,5),(2,6),(2,3),(3,7),(3,4),(4,8),(4,9)])
     return G
 
 def generate_adj_list_as_dict(G):
@@ -29,7 +37,7 @@ def get_dist_from_level(level_dict):
     '''
     dist_dict = {}
     for key, value in level_dict.items():
-        if key <= 0 or not value or len(value) == 0:
+        if key < 0 or not value or len(value) == 0:
             continue
         for node in value:
             dist_dict[node] = key
@@ -151,19 +159,57 @@ def AP_BFS(G, source):
     level_dict0 = MR_BFS(G, source, adj_list)
     dist_dict0 = get_dist_from_level(level_dict0)
 
+    dist_dict0 = dict(sorted(dist_dict0.items(), key=lambda item:item[0]))
     APSP_RES[source] = dist_dict0
 
     # Step (3): Run Incremental-BFS for the remaining nodes in the occurrence
     for i in range(1, len(euler_tour)):
-        incremental_bfs_res = INC_BFS(G, euler_tour[i-1], euler_tour[i], dist_dict0, adj_list)
+        incremental_bfs_res = INC_BFS(G, euler_tour[i-1], euler_tour[i], APSP_RES[euler_tour[i-1]], adj_list)
         dist_dict = get_dist_from_level(incremental_bfs_res)
+        dist_dict = dict(sorted(dist_dict.items(), key=lambda item:item[0]))
         APSP_RES[euler_tour[i]] = dist_dict
     return APSP_RES
 
-
+"""
 G = generate_fixed_graph()
 res = AP_BFS(G, 0)
 print(res)
 print(IO_COUNT)
+"""
 
+# debug
+G = generate_debug_graph()
+# G = generate_fixed_graph()
+# pos = nx.spring_layout(G, k=1)
+
+pos = {0: [-0.87683555,  0.36644588],
+1: [-0.50426159, -0.33825496], 2: [ 0.17216437, -0.10865578],
+ 3: [-0.18483911,  0.27282255], 4: [0.47763095, 0.30200949],
+ 5: [-0.41047382, -1.        ], 6: [0.94495623, 0.02538161],
+ 7: [-0.87848839,  0.08289201], 8: [0.73522478, 0.89431526],
+ 9: [ 0.52492213, -0.49695606]}
+
+"""
+pos = {0: [0.93976803, 0.53330404],
+       1: [-0.27739943, -0.68651481],
+       2: [-0.31284206,  0.0360377 ],
+       3: [0.21028412, 0.84989332],
+       4: [-1.       , -0.5206796],
+       5: [ 0.44018934, -0.21204066]}
+"""
+
+# print(pos)
+nx.draw(G, pos, with_labels=True, width=0.4, node_color='lightblue', node_size=400)
+pylab.show()
+res = AP_BFS(G, 0)
+res = dict(sorted(res.items(), key=lambda item: item[0]))
+
+for i in range(0,10):
+    print('{ii}\t'.format(ii=i))
+    values = res[i]
+    values = dict(sorted(values.items(), key=lambda item:item[0]))
+    print(values)
+
+
+# print(res)
 
