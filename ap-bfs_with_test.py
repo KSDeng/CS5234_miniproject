@@ -6,8 +6,8 @@ import time
 import random
 from itertools import combinations, groupby
 
-M = 100.0         # Memory size
-B = 10.0          # Block size of disk
+M = 5120000         # Memory size
+B = 512             # Block size of disk
 IO_COUNT = 0
 
 def generate_fixed_graph():
@@ -163,10 +163,18 @@ def INC_BFS(G, U, V, dist, adj_list):
     # I/O complexity: O(E/B*d(u,v) + sort(E))
     global IO_COUNT
     E = float(len(G.edges))
-    sortE_IO = max(math.ceil(math.ceil(E/B) * math.log(math.ceil(E/B), math.floor(M/B))), 1)
-    IO_COUNT += math.ceil(math.ceil(E/B)*dist[V] + sortE_IO)
+
+    #sortE_IO = max(math.ceil(math.ceil(E/B) * math.log(math.ceil(E/B), math.floor(M/B))), 1)
+    #IO_COUNT += math.ceil(math.ceil(E/B)*dist[V] + sortE_IO)
+
+    # debug
+    IO_COUNT += math.ceil(math.ceil(E/B)*dist[V])
 
     return L
+
+# debug
+AP_BFS_IO_ARRAY = []
+N_BFS_IO_ARRAY = []
 
 def AP_BFS(G, source):
     APSP_RES = {}           # APSP闂鏈�缁堟眰瑙ｇ粨鏋�
@@ -195,38 +203,65 @@ def AP_BFS(G, source):
     level_dict0 = MR_BFS(G, source, adj_list)
     dist_dict0 = get_dist_from_level(level_dict0)
 
+    # debug
+    AP_BFS_IO_ARRAY.append(IO_COUNT)
+
     dist_dict0 = dict(sorted(dist_dict0.items(), key=lambda item:item[0]))
     APSP_RES[source] = dist_dict0
 
     # Step (3): Run Incremental-BFS for the remaining nodes in the occurrence
     for i in range(1, len(euler_tour)):
+        last_io_count = IO_COUNT
         incremental_bfs_res = INC_BFS(G, euler_tour[i-1], euler_tour[i], APSP_RES[euler_tour[i-1]], adj_list)
         dist_dict = get_dist_from_level(incremental_bfs_res)
         dist_dict = dict(sorted(dist_dict.items(), key=lambda item:item[0]))
         APSP_RES[euler_tour[i]] = dist_dict
+
+        # debug
+        AP_BFS_IO_ARRAY.append(IO_COUNT - last_io_count)
+
     return APSP_RES
 
 
-
-
-
 def N_BFS(G, source):
-    N_RES = {}           # APSP闂傤噣顣介張锟界紒鍫熺湴鐟欙絿绮ㄩ弸锟�
+    N_RES = {}
     adj_list = generate_adj_list_as_dict(G)
 
     # Step (2): Run MR-BFS with the all node.
+    for node in G.nodes:
+        last_io_count = IO_COUNT
+        level_dict0 = MR_BFS(G, node, adj_list)
+        dist_dict0 = get_dist_from_level(level_dict0)
+
+        N_RES[node] = dist_dict0
+
+        # debug
+        N_BFS_IO_ARRAY.append(IO_COUNT - last_io_count)
+
+    """ 
     for i in range(len(G.nodes())):
+        last_io_count = IO_COUNT
         level_dict0 = MR_BFS(G, i, adj_list)
         dist_dict0 = get_dist_from_level(level_dict0)
     
         N_RES[i] = dist_dict0
-    return N_RES 
+
+        # debug
+        N_BFS_IO_ARRAY.append(IO_COUNT - last_io_count)
+    """
+
+    return N_RES
+
+def drawGraph(G):
+    pos = nx.spring_layout(G, k=1)
+    nx.draw(G, pos, with_labels=True, width=0.4, node_color='lightblue', node_size=400)
+    pylab.show()
 
 #IO count 
 #N_LIST = [20, 50, 100, 250, 500, 1000]
 #P_LIST = [0.5, 0.25, 0.1, 0.01,0.001, 0.0001]
-N_LIST = [20,50, 80, 100]
-P_LIST = [0.0001]
+N_LIST = [80]
+P_LIST = [0.5]
 
 #tests
 def naive_test():
@@ -236,14 +271,18 @@ def naive_test():
     for p in P_LIST:
         for n in N_LIST:
             G = generate_random_graph(n,p)
+            drawGraph(G)
             IO_COUNT = 0
             res_ap = AP_BFS(G, 0)
+            print('IO_COUNT for AP_BFS: ', IO_COUNT)
             AP_IO_LIST.append(IO_COUNT)
             
             IO_COUNT = 0
             res_n = N_BFS(G, 0)
+            print('IO_COUNT for N_BFS: ', IO_COUNT)
             N_IO_LIST.append(IO_COUNT)
-        
+
+        """
         plt.title("p = "+ str(p)) 
         plt.xlabel("n")
         plt.ylabel("I/Os")
@@ -254,6 +293,7 @@ def naive_test():
         plt.cla()
         AP_IO_LIST = []
         N_IO_LIST = []
+        """
         
 def source_node_test():
     global IO_COUNT
@@ -290,11 +330,12 @@ def source_node_test():
 
 
 
-G = generate_fixed_graph()
-res = AP_BFS(G, 0)
-print(res)
-print(IO_COUNT)
+#G = generate_fixed_graph()
+#res = AP_BFS(G, 0)
+#print(res)
+#print(IO_COUNT)
 
+naive_test()
 
 # debug
 #G = generate_debug_graph()
