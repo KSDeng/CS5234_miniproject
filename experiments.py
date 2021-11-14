@@ -10,7 +10,8 @@ print(timestamp)
 #N_LIST = [20, 50, 100]
 #P_LIST = [0.5, 0.25, 0.1]
 N_LIST = [20, 50, 100, 250, 500, 1000]
-P_LIST = [0.5, 0.25, 0.1, 0.01,0.001, 0.0001]
+P_LIST = [0.05]
+#P_LIST = [0.5, 0.25, 0.1, 0.01,0.001, 0.0001]
 
 # Experiments 1: test the influence of graph density on naive and ap-bfs algorithm
 AP_IO_LIST = []
